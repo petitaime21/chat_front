@@ -2,7 +2,7 @@
     "name": "chatbot-client",
     "version": "0.1.0",
     "private": true,
-    "homepage": "https://petitaime21.github.com//chat_front",
+    "homepage": "https://petitaime21.github.com/chat_front",
     "dependencies": {
         "@jridgewell/sourcemap-codec": "^1.0.0",
         "@rollup/plugin-terser": "^0.3.0",
