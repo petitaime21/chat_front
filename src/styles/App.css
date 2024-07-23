@@ -29,7 +29,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgb(131 138 187 / 50%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -101,7 +101,7 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 15px;
-  background-color: #f0f2f5;
+  background-color: #e8fbff;
   display: flex;
   flex-direction: column;
 }
@@ -402,4 +402,114 @@ body {
   outline: none;
   box-shadow: 0 0 0 2px #3b82f6;
   background-color: #ffffff;
+}
+
+/* ---- particles.js container ---- */
+.particles_wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#particles-js {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #002555;
+  /*background-image: url("");*/
+  /*background-repeat: no-repeat;*/
+  /*background-size: cover;*/
+  /*background-position: 50% 50%;*/
+}
+
+.bounce {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  white-space: nowrap;
+  position: absolute;
+  flex-direction: column;
+}
+
+.letter_logo{
+  margin-bottom:20px;
+}
+
+.letter {
+  -webkit-animation: bounce 1s cubic-bezier(0.05, 0, 0.2, 1) alternate;
+  animation: bounce 1s cubic-bezier(0.05, 0, 0.2, 1) alternate;
+  display: inline-block;
+  transform: translate3d(0, 0, 0);
+  color: #fff;
+}
+
+.letter:nth-child(1) {
+  -webkit-animation-delay: 0s;
+  animation-delay: 0s;
+  width: 37px;
+  height: 48px;
+  margin-right: 6px;
+  background: url(./images/letter_z.svg) 50% 50%/contain no-repeat;
+}
+
+.letter:nth-child(2) {
+  -webkit-animation-delay: 0.0833333333s;
+  animation-delay: 0.0833333333s;
+  height: 48px;
+  width: 11px;
+  margin-right: 6px;
+  background: url(./images/letter_i.svg) 50% 50%/contain no-repeat;
+}
+
+.letter:nth-child(3) {
+  -webkit-animation-delay: 0.1666666667s;
+  animation-delay: 0.1666666667s;
+  height: 48px;
+  width: 46px;
+  margin-right: 6px;
+  background: url(./images/letter_n.svg) 50% 50%/contain no-repeat;
+}
+
+.letter:nth-child(4) {
+  -webkit-animation-delay: 0.25s;
+  animation-delay: 0.25s;
+  height: 48px;
+  width: 11px;
+  margin-right: 6px;
+  background: url(./images/letter_i.svg) 50% 50%/contain no-repeat;
+}
+
+.letter:nth-child(5) {
+  -webkit-animation-delay: 0.3333333333s;
+  animation-delay: 0.3333333333s;
+  height: 48px;
+  width: 46px;
+  margin-right: 3px;
+  background: url(./images/letter_u.svg) 50% 50%/contain no-repeat;
+}
+
+.letter:nth-child(6) {
+  -webkit-animation-delay: 0.4166666667s;
+  animation-delay: 0.4166666667s;
+  height: 48px;
+  width: 37px;
+  background: url(./images/letter_s.svg) 50% 50%/contain no-repeat;
+}
+
+.hero_sub_text{
+  color:#fff;
+  font-size: 24px;
+  text-align: center;
+  font-weight: 300;
+  margin-bottom: 40px;
+}
+
+.sec_color{
+  color:rgb(255 127 64);
+}
+
+.fw600{
+  font-weight: 600;
 }
