@@ -56,7 +56,7 @@ jobs:
           REACT_APP_SOME_KEY: ${{ secrets.REACT_APP_SOME_KEY }}
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v4
         with:
           path: './build'
           artifact-name: 'github-pages'
