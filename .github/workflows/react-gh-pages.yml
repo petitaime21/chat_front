@@ -56,12 +56,13 @@ jobs:
           REACT_APP_SOME_KEY: ${{ secrets.REACT_APP_SOME_KEY }}
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v2
         with:
           path: './build'
+          artifact-name: 'github-pages'
 
   # Deployment job
-  deploy:
+    deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -71,3 +72,5 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: 'github-pages'
