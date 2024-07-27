@@ -60,7 +60,7 @@ jobs:
         echo "1REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}"
         echo "REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}" >> .env
         echo "TEST=${TEST}" >> .env
-        printenv | grep REACT_APP    
+        printenv
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
