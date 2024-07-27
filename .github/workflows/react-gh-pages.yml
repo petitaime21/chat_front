@@ -40,6 +40,18 @@ jobs:
         npm cache clean --force
         npm install
 
+    - name: Debug environment variables
+      env:
+        REACT_APP_CHAT_API_BASE_URL: ${{ vars.REACT_APP_CHAT_API_BASE_URL }}
+        TEST: ${{ secrets.TEST }}
+      run: |
+        echo "start"
+        echo "REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}"
+        echo "REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}" >> .env.production
+        echo "TEST=${TEST}" >> .env.production
+        echo "done"
+        printenv
+        
     - name: Build React app
       run: npm run build
       env:
@@ -51,16 +63,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: './build'
-    - name: Debug environment variables
-      env:
-        REACT_APP_CHAT_API_BASE_URL: ${{ vars.REACT_APP_CHAT_API_BASE_URL }}
-        TEST: ${{ secrets.TEST }}
-      run: |
-        echo "1REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}"
-        echo "REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}" >> $GITHUB_ENV
-        echo "TEST=${TEST}" >> $GITHUB_ENV
-        printenv
+        path: './build'    
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
