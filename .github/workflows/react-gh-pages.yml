@@ -8,11 +8,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
-
-env:
-  REACT_APP_CHAT_API_BASE_URL: ${{ vars.REACT_APP_CHAT_API_BASE_URL }}
-  TEST: ${{ secrets.TEST }}
-  
+    
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -43,6 +39,9 @@ jobs:
         npm install
 
     - name: Debug environment variables
+      env:
+        REACT_APP_CHAT_API_BASE_URL: ${{ vars.REACT_APP_CHAT_API_BASE_URL }}
+        TEST: ${{ secrets.TEST }}
       run: |
         echo "start"
         echo "REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}"
@@ -53,9 +52,11 @@ jobs:
         cat .env.production
         
     - name: Build React app
-      run: npm run build
+      run: npm run build & echo $TEST11
       env:
         CI: false
+        REACT_APP_CHAT_API_BASE_URL: ${{ vars.REACT_APP_CHAT_API_BASE_URL }}
+        TEST11: ${{ secrets.TEST }}
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
