@@ -42,6 +42,7 @@ jobs:
     - name: Build React app
       run: npm run build
       env:
+        CI: false
         REACT_APP_API_URL: ${{ vars.REACT_APP_API_URL }}
 
     - name: Setup Pages
