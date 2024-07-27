@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import loadingGif from './styles/loading.gif';
+import ReactMarkdown from 'react-markdown';
 
 // Message 컴포넌트
 const Message = ({ text, user, typing }) => {
@@ -54,7 +55,8 @@ const FilePreview = ({ file, onRemove }) => {
 };
 
 // ChatApp 컴포넌트
-const ChatApp = () => {
+const ChatApp = ({start}) => {
+  
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -62,11 +64,24 @@ const ChatApp = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
-
+  
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // 초기 메시지 설정
+  useEffect(() => {
+    if (start) {
+      setTimeout(() => {
+        setMessages((prevMessages) => [...prevMessages, { text: '안녕하세요. 김민수 대표입니다. 무엇을 도와드릴까요?', user: false }]);
+        if (!isDisabled && textareaRef.current) {
+          textareaRef.current.focus(); // 포커스 설정
+        }
+      }, 1000);           
+    }
+  }, [start]);
+ 
+  // 메시지 변경 시 스크롤 조절
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -84,7 +99,7 @@ const ChatApp = () => {
         `${process.env.REACT_APP_CHAT_API_BASE_URL}/api/chat`,
         {
           message: message,
-          files: files.map((file) => file.id), // 파일 ID와 함께 메시지 전송
+          files: files.map((file) => ({ file_id: file.id, file_name:file.name })), // 파일 ID와 함께 메시지 전송
         },
         {
           headers: {
@@ -94,6 +109,7 @@ const ChatApp = () => {
       );
 
       const botMessage = response.data.message;
+      //const botMessage = 'test'
       setMessages((prevMessages) => [
         ...prevMessages.slice(0, -1),
         { text: botMessage, user: false, typing: false },
@@ -102,11 +118,16 @@ const ChatApp = () => {
       console.error('Error fetching the chat response:', error);
       setMessages((prevMessages) => [
         ...prevMessages.slice(0, -1),
-        { text: 'Error fetching the chat response', user: false, typing: false },
+        { text: '메시지 전송중 오류가 발생 하였습니다. 관리자에게 문의 하세요', user: false, typing: false },
       ]);
     } finally {
       setIsDisabled(false); // 메시지 전송 완료 후 상태 해제
       setIsTyping(false);
+      if (textareaRef.current) {
+        textareaRef.current.focus(); // 포커스 설정
+      } else {
+        console.log(1234524523)
+      }
     }
   };
 
@@ -149,7 +170,7 @@ const ChatApp = () => {
         continue;
       }
 
-      const formData = new FormData();
+      const formData = new FormData();      
       formData.append('file', file);
 
       try {
@@ -172,7 +193,7 @@ const ChatApp = () => {
         console.error('Error uploading the file:', error);
         setMessages((prevMessages) => [
           ...prevMessages,
-          { text: 'Error uploading the file.', user: false },
+          { text: '업로드 중 오류가 발생하였습니다. 관리자에게 문의 하세요.', user: false },
         ]);
       }
     }
@@ -257,12 +278,14 @@ const ChatApp = () => {
  
 // App 컴포넌트
 const App = () => {
-  const [isOverlayVisible, setIsOverlayVisible] = useState(true);
+  const [isOverlayVisible, setIsOverlayVisible] = useState(true);    
+  const [start, setStart] = useState(false);
 
   const handleStart = async () => {
     const startButton = document.querySelector('.start-button');
     startButton.classList.add('loading');
     startButton.textContent = "";
+    startButton.disabled = true; // 버튼 비활성화 추가
 
     try {
       await axios.post(`${process.env.REACT_APP_CHAT_API_BASE_URL}/api/chat_start`, {}, {
@@ -274,12 +297,16 @@ const App = () => {
       // 2초 대기
       setTimeout(() => {
         startButton.classList.remove('loading');
-        setIsOverlayVisible(false);
-      }, 2000);
+        // startButton.disabled = false; // 버튼 활성화 추가
+        setIsOverlayVisible(false);        
+        setStart(true);
+      }, 2000);            
+
     } catch (error) {
       console.error('Error starting the chat:', error);
       startButton.classList.remove('loading');
       startButton.textContent = "시작";
+      startButton.disabled = false; // 에러 발생 시 버튼 활성화 추가
     }
   };
 
@@ -291,7 +318,7 @@ const App = () => {
         </div>
       )}
       <div className="ipad-frame">
-        <ChatApp />
+        <ChatApp start={start} />
       </div>
     </div>
   );
