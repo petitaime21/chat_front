@@ -26,13 +26,14 @@ jobs:
 
     - name: Cache dependencies
       uses: actions/cache@v3
+      id: cache-dependencies
       with:
-        path: ~/.npm
+        path: |
+          **/node_modules
         key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.OS }}-node-
 
     - name: Install dependencies
+      if: steps.cache-dependencies.outputs.cache-hit != 'true'
       run: |
         rm -rf node_modules
         rm -f package-lock.json
@@ -43,7 +44,7 @@ jobs:
       run: npm run build
       env:
         CI: false
-        REACT_APP_API_URL: ${{ vars.REACT_APP_CHAT_API_BASE_URL }}
+        REACT_APP_CHAT_API_BASE_URL: ${{ vars.REACT_APP_CHAT_API_BASE_URL }}
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
@@ -52,7 +53,10 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       with:
         path: './build'
-
+    - name: Debug environment variables
+      run: |
+        echo "REACT_APP_API_URL: ${{ vars.REACT_APP_CHAT_API_BASE_URL }}"
+        printenv | grep REACT_APP    
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
