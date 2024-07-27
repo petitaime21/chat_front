@@ -55,9 +55,11 @@ jobs:
     - name: Debug environment variables
       env:
         REACT_APP_CHAT_API_BASE_URL: ${{ vars.REACT_APP_CHAT_API_BASE_URL }}
+        TEST: ${{ secrets.TEST }}
       run: |
-        echo "REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}"
+        echo "1REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}"
         echo "REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}" >> .env
+        echo "TEST=${TEST}" >> .env
         printenv | grep REACT_APP    
     - name: Deploy to GitHub Pages
       id: deployment
