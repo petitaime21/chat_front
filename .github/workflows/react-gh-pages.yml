@@ -53,10 +53,10 @@ jobs:
         env:
           CI: false
           REACT_APP_API_URL: ${{ vars.REACT_APP_API_URL }}
-          REACT_APP_SOME_KEY: ${{ secrets.REACT_APP_SOME_KEY }}
-
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v2
         with:
           path: './build'
           artifact-name: 'github-pages'
