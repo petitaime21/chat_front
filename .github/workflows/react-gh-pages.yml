@@ -44,7 +44,6 @@ jobs:
       run: npm run build
       env:
         CI: false
-        REACT_APP_CHAT_API_BASE_URL: ${{ vars.REACT_APP_CHAT_API_BASE_URL }}
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
@@ -54,6 +53,8 @@ jobs:
       with:
         path: './build'
     - name: Debug environment variables
+      env:
+        REACT_APP_CHAT_API_BASE_URL: ${{ vars.REACT_APP_CHAT_API_BASE_URL }}
       run: |
         echo "REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}"
         echo "REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}" >> .env
