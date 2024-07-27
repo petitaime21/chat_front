@@ -58,8 +58,8 @@ jobs:
         TEST: ${{ secrets.TEST }}
       run: |
         echo "1REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}"
-        echo "REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}" >> .env
-        echo "TEST=${TEST}" >> .env
+        echo "REACT_APP_CHAT_API_BASE_URL=${REACT_APP_CHAT_API_BASE_URL}" >> $GITHUB_ENV
+        echo "TEST=${TEST}" >> $GITHUB_ENV
         printenv
     - name: Deploy to GitHub Pages
       id: deployment
