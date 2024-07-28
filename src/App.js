@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import loadingGif from './styles/loading.gif';
-import ReactMarkdown from 'react-markdown';
+import { v4 as uuidv4 } from 'uuid';
+//import ReactMarkdown from 'react-markdown';
 
 // Message 컴포넌트
 const Message = ({ text, user, typing }) => {
@@ -59,7 +60,7 @@ const ChatApp = ({start}) => {
   
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  // const [isTyping, setIsTyping] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const messagesEndRef = useRef(null);
@@ -69,29 +70,38 @@ const ChatApp = ({start}) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  useEffect(() => {
+    if (!isDisabled && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isDisabled]); // isDisabled가 변경될 때마다 포커스 설정
+
   // 초기 메시지 설정
   useEffect(() => {
     if (start) {
-      setTimeout(() => {
-        setMessages((prevMessages) => [...prevMessages, { text: '안녕하세요. 김민수 대표입니다. 무엇을 도와드릴까요?', user: false }]);
-        if (!isDisabled && textareaRef.current) {
-          textareaRef.current.focus(); // 포커스 설정
-        }
-      }, 1000);           
+      const timer = setTimeout(() => {
+        setMessages((prevMessages) => [...prevMessages, { id: uuidv4(), text: '안녕하세요. 김민수 대표입니다. 무엇을 도와드릴까요?', user: false }]);
+        // if (!isDisabled && textareaRef.current) {
+        //   textareaRef.current.focus(); // 포커스 설정
+        // }        
+        textareaRef.current.focus();
+        
+      }, 1000);         
+      return () => clearTimeout(timer)  
     }
   }, [start]);
  
   // 메시지 변경 시 스크롤 조절
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages]);  
 
   const handleSendMessage = async (message, files = []) => {
-    setMessages((prevMessages) => [...prevMessages, { text: message, user: true }]);
+    setMessages((prevMessages) => [...prevMessages, { id: uuidv4(), text: message, user: true }]);
     setInputValue('');
     setIsDisabled(true); // 메시지 전송 중 상태로 설정
-    setIsTyping(true);
-    setMessages((prevMessages) => [...prevMessages, { text: '', user: false, typing: true }]);
+    // setIsTyping(true);
+    setMessages((prevMessages) => [...prevMessages, { id: uuidv4(), text: '', user: false, typing: true }]);
     scrollToBottom();
 
     try {
@@ -112,22 +122,17 @@ const ChatApp = ({start}) => {
       //const botMessage = 'test'
       setMessages((prevMessages) => [
         ...prevMessages.slice(0, -1),
-        { text: botMessage, user: false, typing: false },
+        { id: uuidv4(), text: botMessage, user: false, typing: false },
       ]);
     } catch (error) {
       console.error('Error fetching the chat response:', error);
       setMessages((prevMessages) => [
         ...prevMessages.slice(0, -1),
-        { text: '메시지 전송중 오류가 발생 하였습니다. 관리자에게 문의 하세요', user: false, typing: false },
+        { id: uuidv4(), text: '메시지 전송중 오류가 발생 하였습니다. 관리자에게 문의 하세요', user: false, typing: false },
       ]);
     } finally {
       setIsDisabled(false); // 메시지 전송 완료 후 상태 해제
-      setIsTyping(false);
-      if (textareaRef.current) {
-        textareaRef.current.focus(); // 포커스 설정
-      } else {
-        console.log(1234524523)
-      }
+      // setIsTyping(false);
     }
   };
 
@@ -165,7 +170,7 @@ const ChatApp = ({start}) => {
       if (extension !== 'txt') {
         setMessages((prevMessages) => [
           ...prevMessages,
-          { text: 'txt 확장자 파일만 받습니다.', user: false },
+          { id: uuidv4(), text: 'txt 확장자 파일만 받습니다.', user: false },
         ]);
         continue;
       }
@@ -180,7 +185,6 @@ const ChatApp = ({start}) => {
           }
         });
 
-        const res_message = response.data.message;
         const res_fileId = response.data.fileId;
         console.log(`File ID: ${res_fileId}`);
 
@@ -193,7 +197,7 @@ const ChatApp = ({start}) => {
         console.error('Error uploading the file:', error);
         setMessages((prevMessages) => [
           ...prevMessages,
-          { text: '업로드 중 오류가 발생하였습니다. 관리자에게 문의 하세요.', user: false },
+          { id: uuidv4(), text: '업로드 중 오류가 발생하였습니다. 관리자에게 문의 하세요.', user: false },
         ]);
       }
     }
@@ -210,8 +214,8 @@ const ChatApp = ({start}) => {
   return (
     <div className="chat-interface">
       <div className="chat-messages">
-        {messages.map((message, index) => (
-          <Message key={index} text={message.text} user={message.user} typing={message.typing} />
+        {messages.map((message) => (
+          <Message key={message.id} text={message.text} user={message.user} typing={message.typing} />
         ))}
         <div ref={messagesEndRef} />
       </div>
