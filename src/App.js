@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import loadingGif from './styles/loading.gif';
+import videoSrc from './styles/images/CEO_KIM.mp4';
 import { v4 as uuidv4 } from 'uuid';
+import playButtonSrc from './styles/images/play-button.png';
 //import ReactMarkdown from 'react-markdown';
 
 // Message 컴포넌트
@@ -80,7 +82,7 @@ const ChatApp = ({start}) => {
   useEffect(() => {
     if (start) {
       const timer = setTimeout(() => {
-        setMessages((prevMessages) => [...prevMessages, { id: uuidv4(), text: '안녕하세요. 김민수 대표입니다. 무엇을 도와드릴까요?', user: false }]);
+        setMessages((prevMessages) => [...prevMessages, { id: uuidv4(), text: '안녕하세요. 김민수 대표입니다.', user: false }]);
         // if (!isDisabled && textareaRef.current) {
         //   textareaRef.current.focus(); // 포커스 설정
         // }        
@@ -283,7 +285,9 @@ const ChatApp = ({start}) => {
 // App 컴포넌트
 const App = () => {
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);    
-  const [start, setStart] = useState(false);
+  const [start, setStart] = useState(false);  
+  const [showPlayButton, setShowPlayButton] = useState(true);
+  const videoRef = useRef(null);
 
   const handleStart = async () => {
     const startButton = document.querySelector('.start-button');
@@ -314,18 +318,44 @@ const App = () => {
     }
   };
 
+  const togglePlay = () => {
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+      setShowPlayButton(false);
+    } else {
+      videoRef.current.pause();
+      setShowPlayButton(true);
+    }
+  };
+
   return (
     <div className="App">
-      {isOverlayVisible && (
-        <div className="overlay">
-          <button className="start-button" onClick={handleStart}>시작</button>
+      <div className="content-container">
+        <div className="ipad-frame-container">
+          {isOverlayVisible && (
+            <div className="overlay">
+              <button className="start-button" onClick={handleStart}>시작</button>
+            </div>
+          )}
+          <div className="ipad-frame">
+            <ChatApp start={start} />
+          </div>
         </div>
-      )}
-      <div className="ipad-frame">
-        <ChatApp start={start} />
+        <div className="video-container">
+          <div className="video-wrapper" onClick={togglePlay}>
+            <video ref={videoRef} width="320" height="480">
+              <source src={videoSrc} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            {showPlayButton && (
+              <img src={playButtonSrc} alt="Play" className="play-button" />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+
 
 export default App;
