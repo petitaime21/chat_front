@@ -58,7 +58,7 @@ const FilePreview = ({ file, onRemove }) => {
 };
 
 // ChatApp 컴포넌트
-const ChatApp = ({start}) => {
+const ChatApp = ({start, threadId}) => {
   
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -107,11 +107,14 @@ const ChatApp = ({start}) => {
     scrollToBottom();
 
     try {
+      const currentThreadId = sessionStorage.getItem('threadId');
+      console.log('Using threadId:', currentThreadId); // 디버깅용 로그
       const response = await axios.post(
         `${process.env.REACT_APP_CHAT_API_BASE_URL}/api/chat`,
         {
           message: message,
           files: files.map((file) => ({ file_id: file.id, file_name:file.name })), // 파일 ID와 함께 메시지 전송
+          threadId: currentThreadId, // threadId 추가
         },
         {
           headers: {
@@ -288,6 +291,12 @@ const App = () => {
   const [start, setStart] = useState(false);  
   const [showPlayButton, setShowPlayButton] = useState(true);
   const videoRef = useRef(null);
+  const [threadId, setThreadId] = useState(null);
+  
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때 sessionStorage를 클리어합니다.
+    sessionStorage.clear();    
+  }, []);
 
   const handleStart = async () => {
     const startButton = document.querySelector('.start-button');
@@ -296,11 +305,22 @@ const App = () => {
     startButton.disabled = true; // 버튼 비활성화 추가
 
     try {
-      await axios.post(`${process.env.REACT_APP_CHAT_API_BASE_URL}/api/chat_start`, {}, {
+      const response = await axios.post(`${process.env.REACT_APP_CHAT_API_BASE_URL}/api/chat_start`, {}, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
+
+      console.log(response.data)
+
+      const newThreadId = response.data.threadId;
+      if (newThreadId) {
+        setThreadId(newThreadId);
+        sessionStorage.setItem('threadId', newThreadId.toString()); // 문자열로 저장
+        console.log('ThreadId set:', newThreadId); // 디버깅용 로그
+      } else {
+        console.error('No threadId received from server');
+      }
 
       // 2초 대기
       setTimeout(() => {
@@ -338,7 +358,7 @@ const App = () => {
             </div>
           )}
           <div className="ipad-frame">
-            <ChatApp start={start} />
+            <ChatApp start={start} threadId={threadId}/>
           </div>
         </div>
         <div className="video-container">
