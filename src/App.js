@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import loadingGif from './styles/loading.gif';
+import loadingGif from './styles/images/loading.gif';
 import videoSrc from './styles/images/CEO_KIM.mp4';
 import { v4 as uuidv4 } from 'uuid';
 import playButtonSrc from './styles/images/play-button.png';
+import infoGraphicSrc from './styles/images/infographic.png'; //
 //import ReactMarkdown from 'react-markdown';
 
 // Message 컴포넌트
@@ -292,6 +293,7 @@ const App = () => {
   const [showPlayButton, setShowPlayButton] = useState(true);
   const videoRef = useRef(null);
   const [threadId, setThreadId] = useState(null);
+  const [showInfoGraphic, setShowInfoGraphic] = useState(false);
   
   useEffect(() => {
     // 컴포넌트가 마운트될 때 sessionStorage를 클리어합니다.
@@ -348,6 +350,11 @@ const App = () => {
     }
   };
 
+  const toggleInfoGraphic = (e) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    setShowInfoGraphic(!showInfoGraphic);
+  };
+
   return (
     <div className="App">
       <div className="content-container">
@@ -361,7 +368,7 @@ const App = () => {
             <ChatApp start={start} threadId={threadId}/>
           </div>
         </div>
-        <div className="video-container">
+        <div className="video-container">          
           <div className="video-wrapper" onClick={togglePlay}>
             <video ref={videoRef} width="320" height="480">
               <source src={videoSrc} type="video/mp4" />
@@ -369,10 +376,16 @@ const App = () => {
             </video>
             {showPlayButton && (
               <img src={playButtonSrc} alt="Play" className="play-button" />
-            )}
+            )}            
           </div>
+          <button className="info-button" onClick={toggleInfoGraphic}>InfoGraphic</button>
         </div>
       </div>
+      {showInfoGraphic && (
+        <div className="info-graphic-overlay" onClick={toggleInfoGraphic}>
+        <img src={infoGraphicSrc} alt="Infographic" className="info-graphic" onClick={(e) => e.stopPropagation()} />
+      </div>
+      )}
     </div>
   );
 };
