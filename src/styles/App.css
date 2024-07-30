@@ -222,7 +222,7 @@ span, p, a, div, ul, li {
 
 .message-container {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 10px;
 }
 
@@ -240,6 +240,7 @@ span, p, a, div, ul, li {
   border-radius: 50%;
   background-size: cover;
   background-position: center;
+  align-self: flex-start; /* 추가: 상단에 정렬 */
 }
 
 .user-image {
@@ -256,7 +257,7 @@ span, p, a, div, ul, li {
 .message {
   max-width: 50%;
   width: fit-content;
-  padding: 0 20px;
+  padding: 0px 20px; /* 변경: 상하 패딩 추가 */
   border-radius: 20px;
   display: inline-block;
   word-wrap: break-word;

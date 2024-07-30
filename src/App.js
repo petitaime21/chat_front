@@ -1,359 +1,94 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import loadingGif from './styles/images/loading.gif';
-import videoSrc from './styles/images/CEO_KIM.mp4';
-import { v4 as uuidv4 } from 'uuid';
-import playButtonSrc from './styles/images/play-button.png';
-import infoGraphicSrc from './styles/images/infographic.png'; //
-//import ReactMarkdown from 'react-markdown';
+import ChatInterface from './components/ChatInterface';
+import VideoPlayer from './components/VideoPlayer';
+import useChatLogic from './hooks/useChatLogic';
+import useFileUpload from './hooks/useFileUpload';
 
-// Message 컴포넌트
-const Message = ({ text, user, typing }) => {
-  return (
-    <div className={`message-container ${user ? 'user' : 'bot'} ${typing ? 'typing' : ''}`}>
-      <div className={`${user ? 'user-image' : 'bot-image'}`}></div>
-      <div className={`message ${user ? 'user' : 'bot'} ${typing ? 'typing' : ''}`}>
-        {typing ? (
-          <div className="typing-indicator">
-            <img src={loadingGif} alt="로딩 중" className="loading-image" />            
-            <p>{typing ? '' : text}</p>
-          </div>
-        ) : (
-          <p>{text}</p>
-        )}
-      </div>
-    </div>
+const ChatApp = React.memo(({ start, threadId }) => {
+  const {
+    messages,
+    inputValue,
+    isDisabled,
+    uploadedFiles,
+    handleSendMessage,
+    handleInputChange,
+    handleKeyDown,
+    handleSubmit,
+    setMessages,
+    setUploadedFiles,
+    setIsDisabled,    
+  } = useChatLogic(start, threadId);
+
+  const { handleFileUpload, handleRemoveFile } = useFileUpload(
+    setMessages,
+    setUploadedFiles,
+    setIsDisabled
   );
-};
-
-// FilePreview 컴포넌트
-const FilePreview = ({ file, onRemove }) => {
-  return (
-    <div className="group relative inline-block text-sm text-token-text-primary">
-      <div className="relative overflow-hidden rounded-xl border border-token-border-light bg-token-main-surface-primary">
-        <div className="p-2 w-80">
-          <div className="flex flex-row items-center gap-2">
-            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" fill="none" className="h-10 w-10 flex-shrink-0" width="36" height="36">
-                <rect width="36" height="36" rx="6" fill="#0000FF"></rect>
-                <path d="M18.833 9.66663H12.9997C12.5576 9.66663 12.1337 9.84222 11.8212 10.1548C11.5086 10.4673 11.333 10.8913 11.333 11.3333V24.6666C11.333 25.1087 11.5086 25.5326 11.8212 25.8451C12.1337 26.1577 12.5576 26.3333 12.9997 26.3333H22.9997C23.4417 26.3333 23.8656 26.1577 24.1782 25.8451C24.4907 25.5326 24.6663 25.1087 24.6663 24.6666V15.5L18.833 9.66663Z" stroke="white" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"></path>
-                <path d="M18.833 9.66663V15.5H24.6663" stroke="white" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"></path>
-              </svg>
-            </div>
-            <div className="overflow-hidden">
-              <div className="truncate font-semibold">{file.name}</div>
-              <div className="truncate text-token-text-tertiary">파일</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <button className="absolute right-1 top-1 -translate-y-1/2 translate-x-1/2 rounded-full border border-token-border-heavy bg-token-main-surface-secondary p-0.5 text-token-text-primary transition-colors hover:opacity-100 group-hover:opacity-100 md:opacity-0" onClick={() => onRemove(file.id)}>
-        <span data-state="closed">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" className="icon-sm">
-            <path fill="currentColor" fillRule="evenodd" d="M5.636 5.636a1 1 0 0 1 1.414 0l4.95 4.95 4.95-4.95a1 1 0 0 1 1.414 1.414L13.414 12l4.95 4.95a1 1 0 0 1-1.414 1.414L12 13.414l-4.95 4.95a1 1 0 0 1-1.414-1.414l4.95-4.95-4.95-4.95a1 1 0 0 1 0-1.414" clipRule="evenodd"></path>
-          </svg>
-        </span>
-      </button>
-    </div>
-  );
-};
-
-// ChatApp 컴포넌트
-const ChatApp = ({start, threadId}) => {
-  
-  const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState('');
-  // const [isTyping, setIsTyping] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const messagesEndRef = useRef(null);
-  const textareaRef = useRef(null);
-  
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    if (!isDisabled && textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  }, [isDisabled]); // isDisabled가 변경될 때마다 포커스 설정
-
-  // 초기 메시지 설정
-  useEffect(() => {
-    if (start) {
-      const timer = setTimeout(() => {
-        setMessages((prevMessages) => [...prevMessages, { id: uuidv4(), text: '안녕하세요. 김민수 대표입니다.', user: false }]);
-        // if (!isDisabled && textareaRef.current) {
-        //   textareaRef.current.focus(); // 포커스 설정
-        // }        
-        textareaRef.current.focus();
-        
-      }, 1000);         
-      return () => clearTimeout(timer)  
-    }
-  }, [start]);
- 
-  // 메시지 변경 시 스크롤 조절
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);  
-
-  const handleSendMessage = async (message, files = []) => {
-    setMessages((prevMessages) => [...prevMessages, { id: uuidv4(), text: message, user: true }]);
-    setInputValue('');
-    setIsDisabled(true); // 메시지 전송 중 상태로 설정
-    // setIsTyping(true);
-    setMessages((prevMessages) => [...prevMessages, { id: uuidv4(), text: '', user: false, typing: true }]);
-    scrollToBottom();
-
-    try {
-      const currentThreadId = sessionStorage.getItem('threadId');
-      console.log('Using threadId:', currentThreadId); // 디버깅용 로그
-      const response = await axios.post(
-        `${process.env.REACT_APP_CHAT_API_BASE_URL}/api/chat`,
-        {
-          message: message,
-          files: files.map((file) => ({ file_id: file.id, file_name:file.name })), // 파일 ID와 함께 메시지 전송
-          threadId: currentThreadId, // threadId 추가
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
-      );
-
-      const botMessage = response.data.message;
-      //const botMessage = 'test'
-      setMessages((prevMessages) => [
-        ...prevMessages.slice(0, -1),
-        { id: uuidv4(), text: botMessage, user: false, typing: false },
-      ]);
-    } catch (error) {
-      console.error('Error fetching the chat response:', error);
-      setMessages((prevMessages) => [
-        ...prevMessages.slice(0, -1),
-        { id: uuidv4(), text: '메시지 전송중 오류가 발생 하였습니다. 관리자에게 문의 하세요', user: false, typing: false },
-      ]);
-    } finally {
-      setIsDisabled(false); // 메시지 전송 완료 후 상태 해제
-      // setIsTyping(false);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (inputValue.trim()) {
-      handleSendMessage(inputValue, uploadedFiles); // 업로드된 파일들을 함께 전달
-      setUploadedFiles([]); // 메시지 전송 후 업로드된 파일 초기화
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      handleSubmit(e);
-      e.preventDefault();
-    }
-  };
-
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  };
-
-  const handleFileUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const newUploadedFiles = [];
-
-    setIsDisabled(true); // 파일 업로드 중 상태로 설정
-
-    for (const file of files) {
-      const extension = file.name.split('.').pop().toLowerCase();
-      if (extension !== 'txt') {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { id: uuidv4(), text: 'txt 확장자 파일만 받습니다.', user: false },
-        ]);
-        continue;
-      }
-
-      const formData = new FormData();      
-      formData.append('file', file);
-
-      try {
-        const response = await axios.post(`${process.env.REACT_APP_CHAT_API_BASE_URL}/api/upload`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          }
-        });
-
-        const res_fileId = response.data.fileId;
-        console.log(`File ID: ${res_fileId}`);
-
-        newUploadedFiles.push({
-          id: res_fileId,
-          name: file.name,
-          url: URL.createObjectURL(file), // 파일 미리보기 URL
-        });
-      } catch (error) {
-        console.error('Error uploading the file:', error);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { id: uuidv4(), text: '업로드 중 오류가 발생하였습니다. 관리자에게 문의 하세요.', user: false },
-        ]);
-      }
-    }
-
-    setUploadedFiles((prevFiles) => [...prevFiles, ...newUploadedFiles]);
-    setIsDisabled(false); // 파일 업로드 완료 후 상태 해제
-    e.target.value = ''; // 추가된 부분: 파일 입력 필드 초기화
-  };
-
-  const handleRemoveFile = (fileId) => {
-    setUploadedFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));
-  };
 
   return (
-    <div className="chat-interface">
-      <div className="chat-messages">
-        {messages.map((message) => (
-          <Message key={message.id} text={message.text} user={message.user} typing={message.typing} />
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className="input-area">
-        <div className="uploaded-files">
-          {uploadedFiles.map((file) => (
-            <FilePreview key={file.id} file={file} onRemove={handleRemoveFile} />
-          ))}
-        </div>
-        <div className="input-area-content">
-          <input
-            type="file"
-            id="file-upload"
-            style={{ display: 'none' }}
-            multiple
-            onChange={handleFileUpload}
-            disabled={isDisabled} // 업로드 버튼 비활성화
-          />
-          <button
-            className={`attach-button ${isDisabled ? 'disabled' : ''}`}
-            onClick={() => document.getElementById('file-upload').click()}
-            disabled={isDisabled} // 업로드 버튼 비활성화
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                fillRule="evenodd"
-                d="M9 7a5 5 0 0 1 10 0v8a7 7 0 1 1-14 0V9a1 1 0 0 1 2 0v6a5 5 0 0 0 10 0V7a3 3 0 1 0-6 0v8a1 1 0 1 0 2 0V9a1 1 0 1 1 2 0v6a3 3 0 1 1-6 0z"
-                clipRule="evenodd"
-              ></path>
-            </svg>
-          </button>
-          <form onSubmit={handleSubmit} style={{ flex: 1 }}>
-            <textarea
-              ref={textareaRef}
-              value={inputValue}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder="메시지를 입력하세요..."
-              rows={1}
-              style={{ resize: 'none', overflow: 'hidden' }}
-              disabled={isDisabled}
-            />
-          </form>
-          <button
-            className={`send-button ${isDisabled ? 'disabled' : ''}`}
-            onClick={handleSubmit}
-            disabled={isDisabled} // 전송 버튼 비활성화
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32" className="icon-2xl">
-              <path
-                fill="currentColor"
-                fillRule="evenodd"
-                d="M15.192 8.906a1.143 1.143 0 0 1 1.616 0l5.143 5.143a1.143 1.143 0 0 1-1.616 1.616l-3.192-3.192v9.813a1.143 1.143 0 0 1-2.286 0v-9.813l-3.192 3.192a1.143 1.143 0 1 1-1.616-1.616z"
-                clipRule="evenodd"
-              ></path>
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
+    <ChatInterface
+      messages={messages}
+      inputValue={inputValue}
+      isDisabled={isDisabled}
+      uploadedFiles={uploadedFiles}
+      onSendMessage={handleSendMessage}
+      onInputChange={handleInputChange}
+      onKeyDown={handleKeyDown}
+      onSubmit={handleSubmit}
+      onFileUpload={handleFileUpload}
+      onRemoveFile={handleRemoveFile}      
+    />
   );
-};
- 
-// App 컴포넌트
+});
+
 const App = () => {
-  const [isOverlayVisible, setIsOverlayVisible] = useState(true);    
-  const [start, setStart] = useState(false);  
-  const [showPlayButton, setShowPlayButton] = useState(true);
-  const videoRef = useRef(null);
+  const [isOverlayVisible, setIsOverlayVisible] = useState(true);
+  const [start, setStart] = useState(false);
   const [threadId, setThreadId] = useState(null);
   const [showInfoGraphic, setShowInfoGraphic] = useState(false);
-  
+  const [isChatStarted, setIsChatStarted] = useState(false);
+
   useEffect(() => {
-    // 컴포넌트가 마운트될 때 sessionStorage를 클리어합니다.
-    sessionStorage.clear();    
+    sessionStorage.clear();
   }, []);
 
-  const handleStart = async () => {
+  const handleStart = useCallback(async () => {
     const startButton = document.querySelector('.start-button');
     startButton.classList.add('loading');
     startButton.textContent = "";
-    startButton.disabled = true; // 버튼 비활성화 추가
+    startButton.disabled = true;
 
     try {
       const response = await axios.post(`${process.env.REACT_APP_CHAT_API_BASE_URL}/api/chat_start`, {}, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       });
-
-      console.log(response.data)
 
       const newThreadId = response.data.threadId;
       if (newThreadId) {
         setThreadId(newThreadId);
-        sessionStorage.setItem('threadId', newThreadId.toString()); // 문자열로 저장
-        console.log('ThreadId set:', newThreadId); // 디버깅용 로그
+        sessionStorage.setItem('threadId', newThreadId.toString());
+        setIsChatStarted(true);
       } else {
         console.error('No threadId received from server');
       }
 
-      // 2초 대기
       setTimeout(() => {
         startButton.classList.remove('loading');
-        // startButton.disabled = false; // 버튼 활성화 추가
-        setIsOverlayVisible(false);        
+        setIsOverlayVisible(false);
         setStart(true);
-      }, 2000);            
-
+      }, 2000);
     } catch (error) {
       console.error('Error starting the chat:', error);
       startButton.classList.remove('loading');
       startButton.textContent = "시작";
-      startButton.disabled = false; // 에러 발생 시 버튼 활성화 추가
+      startButton.disabled = false;
     }
-  };
+  }, []);
 
-  const togglePlay = () => {
-    if (videoRef.current.paused) {
-      videoRef.current.play();
-      setShowPlayButton(false);
-    } else {
-      videoRef.current.pause();
-      setShowPlayButton(true);
-    }
-  };
-
-  const toggleInfoGraphic = (e) => {
-    e.stopPropagation(); // 이벤트 버블링 방지
-    setShowInfoGraphic(!showInfoGraphic);
-  };
+  const toggleInfoGraphic = useCallback(() => {
+    setShowInfoGraphic(prev => !prev);
+  }, []);
 
   return (
     <div className="App">
@@ -365,30 +100,13 @@ const App = () => {
             </div>
           )}
           <div className="ipad-frame">
-            <ChatApp start={start} threadId={threadId}/>
+            <ChatApp start={start} threadId={threadId} isChatStarted={isChatStarted} />
           </div>
         </div>
-        <div className="video-container">          
-          <div className="video-wrapper" onClick={togglePlay}>
-            <video ref={videoRef} width="320" height="480">
-              <source src={videoSrc} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-            {showPlayButton && (
-              <img src={playButtonSrc} alt="Play" className="play-button" />
-            )}            
-          </div>
-          <button className="info-button" onClick={toggleInfoGraphic}>InfoGraphic</button>
-        </div>
+        <VideoPlayer showInfoGraphic={showInfoGraphic} toggleInfoGraphic={toggleInfoGraphic} />
       </div>
-      {showInfoGraphic && (
-        <div className="info-graphic-overlay" onClick={toggleInfoGraphic}>
-        <img src={infoGraphicSrc} alt="Infographic" className="info-graphic" onClick={(e) => e.stopPropagation()} />
-      </div>
-      )}
     </div>
   );
 };
-
 
 export default App;
