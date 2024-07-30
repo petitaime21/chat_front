@@ -120,7 +120,7 @@ span, p, a, div, ul, li {
 .info-button {    
   width: 320px; /* 비디오 폭과 동일 */
   padding: 12px 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(255, 255, 255, 0.5);
   color: white;
   border: none;
   border-radius: 0 0 5px 5px;
@@ -131,7 +131,7 @@ span, p, a, div, ul, li {
 }
 
 .info-button:hover {
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: #3b82f6;
 }
 
 .video-wrapper {
@@ -175,8 +175,8 @@ span, p, a, div, ul, li {
 }
 
 .info-graphic {
-  max-width: 80%;
-  max-height: 80%;
+  /* max-width: 80%; */
+  max-height: 90%;
   animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 

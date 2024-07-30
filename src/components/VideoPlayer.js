@@ -2,6 +2,8 @@ import React, { useState, useRef, useCallback } from 'react';
 import videoSrc from '../styles/images/CEO_KIM.mp4';
 import playButtonSrc from '../styles/images/play-button.png';
 import InfoGraphic from '../components/InfoGraphic';
+import ziniLogo from '../styles/images/new_nice_logo_ko.svg';
+
 
 const VideoPlayer = () => {
   const [showPlayButton, setShowPlayButton] = useState(true);
@@ -34,7 +36,9 @@ const VideoPlayer = () => {
           <img src={playButtonSrc} alt="Play" className="play-button" />
         )}
       </div>
-      <button className="info-button" onClick={toggleInfoGraphic}>InfoGraphic</button>
+      <button className="info-button" onClick={toggleInfoGraphic}>
+        <img src={ziniLogo} alt="대체 텍스트" onclick="" />
+      </button>
       {showInfoGraphic && <InfoGraphic onClose={toggleInfoGraphic} />}
     </div>
     
