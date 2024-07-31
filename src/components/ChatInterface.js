@@ -43,7 +43,7 @@ const ChatInterface = ({
     <div className="chat-interface">
       <div className="chat-messages">
         {messages.map((message) => (
-          <Message key={message.id} text={message.text} user={message.user} typing={message.typing} />
+          <Message key={message.id} text={message.text} user={message.user} typing={message.typing} attachedFiles={message.attachedFiles}/>
         ))}
         <div ref={messagesEndRef} />
       </div>

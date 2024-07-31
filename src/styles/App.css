@@ -14,7 +14,9 @@ body {
 .App {
   position: relative;
   width: 1400px; /* 늘어난 너비 */
-  height: 768px;
+  height: 70vh;
+  /* height: 768px; */
+  min-height: 700px;
   background-color: rgba(255, 255, 255, 0.9);
   border-radius: 30px;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
@@ -311,6 +313,20 @@ span, p, a, div, ul, li {
   cursor: not-allowed; /* 커서 모양 변경 */
 }
 
+.attached-files {
+  margin-top: 10px;
+  font-size: 0.9em;
+}
+
+/* .attached-files ul {
+  list-style-type: none;
+  padding-left: 10px;
+} */
+
+.attached-files li {
+  margin-bottom: 5px;
+}
+
 .group {
   position: relative;
   display: inline-block;
@@ -464,6 +480,7 @@ span, p, a, div, ul, li {
   align-items: center;
   z-index: 1; /* 추가된 부분 */
 }
+ 
 
 .input-area-content {
   display: flex;

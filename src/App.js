@@ -5,7 +5,7 @@ import VideoPlayer from './components/VideoPlayer';
 import useChatLogic from './hooks/useChatLogic';
 import useFileUpload from './hooks/useFileUpload';
 
-const ChatApp = React.memo(({ start, threadId }) => {
+const ChatApp = React.memo(({ start, threadId, isChatStarted }) => {
   const {
     messages,
     inputValue,
@@ -18,7 +18,7 @@ const ChatApp = React.memo(({ start, threadId }) => {
     setMessages,
     setUploadedFiles,
     setIsDisabled,    
-  } = useChatLogic(start, threadId);
+  } = useChatLogic(start, threadId, isChatStarted);
 
   const { handleFileUpload, handleRemoveFile } = useFileUpload(
     setMessages,
@@ -47,7 +47,7 @@ const App = () => {
   const [start, setStart] = useState(false);
   const [threadId, setThreadId] = useState(null);
   const [showInfoGraphic, setShowInfoGraphic] = useState(false);
-  const [isChatStarted, setIsChatStarted] = useState(false);
+  const [isChatStarted, setIsChatStarted] = useState(false);  
 
   useEffect(() => {
     sessionStorage.clear();
@@ -92,6 +92,7 @@ const App = () => {
 
   return (
     <div className="App">
+ 
       <div className="content-container">
         <div className="ipad-frame-container">
           {isOverlayVisible && (

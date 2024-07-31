@@ -7,14 +7,14 @@ const useFileUpload = (setMessages, setUploadedFiles, setIsDisabled) => {
     const files = Array.from(e.target.files);
     const newUploadedFiles = [];
 
-    setIsDisabled(true);
+    setIsDisabled(true);    
 
     for (const file of files) {
       const extension = file.name.split('.').pop().toLowerCase();
       if (extension !== 'txt') {
         setMessages((prevMessages) => [
           ...prevMessages,
-          { id: uuidv4(), text: 'txt 확장자 파일만 받습니다.', user: false },
+          { id: uuidv4(), text: `첨부실패: ${file.name} \n주의! txt 확장자 파일만 받습니다.`, user: false },
         ]);
         continue;
       }
@@ -47,7 +47,7 @@ const useFileUpload = (setMessages, setUploadedFiles, setIsDisabled) => {
     }
 
     setUploadedFiles((prevFiles) => [...prevFiles, ...newUploadedFiles]);
-    setIsDisabled(false);
+    setIsDisabled(false);    
     e.target.value = '';
   }, [setMessages, setUploadedFiles, setIsDisabled]);
 
