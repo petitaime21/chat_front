@@ -36,6 +36,7 @@ const useChatLogic = (start, threadId, isChatStarted, setIsLoading) => {
     // 사용자 메시지 추가
     setMessages((prevMessages) => [...prevMessages, { id: uuidv4(), text: message, user: true, typing: false, attachedFiles: files}]);
     setInputValue('');
+    setUploadedFiles([]);
     setIsDisabled(true);
     
     // 봇 응답 대기 메시지 추가
@@ -107,7 +108,7 @@ const useChatLogic = (start, threadId, isChatStarted, setIsLoading) => {
       e.preventDefault();
       if (inputValue.trim()) {
         handleSendMessage(inputValue, uploadedFiles);
-        setUploadedFiles([]);
+        //setUploadedFiles([]);
       }
     }
   }, [inputValue, uploadedFiles, handleSendMessage]);
@@ -117,7 +118,7 @@ const useChatLogic = (start, threadId, isChatStarted, setIsLoading) => {
     e.preventDefault();
     if (inputValue.trim()) {
       handleSendMessage(inputValue, uploadedFiles);
-      setUploadedFiles([]);
+      //setUploadedFiles([]);
     }
   }, [inputValue, uploadedFiles, handleSendMessage]);
 
