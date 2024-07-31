@@ -81,7 +81,7 @@ const useChatLogic = (start, threadId, isChatStarted, setIsLoading) => {
       // 에러 메시지 추가
       setMessages((prevMessages) => [
         ...prevMessages.slice(0, -1),
-        { id: uuidv4(), text: '메시지 전송중 오류가 발생 하였습니다. 관리자에게 문의 하세요', user: false, typing: false, attachedFiles: []},
+        { id: uuidv4(), text: '메시지 전송중 오류가 발생 하였습니다. [F5] 새로고침 하거나\n문제가 지속될 경우 관리자에게 문의 하세요', user: false, typing: false, attachedFiles: []},
       ]);
     } finally {
       setIsDisabled(false);
