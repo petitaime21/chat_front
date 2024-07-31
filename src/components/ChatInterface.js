@@ -15,8 +15,10 @@ const ChatInterface = ({
   onRemoveFile,
   isChatStarted
 }) => {
+  // 메시지 목록의 끝을 참조하기 위한 ref
   const messagesEndRef = useRef(null);  
 
+  // 채팅이 시작되고 입력이 가능할 때 텍스트 영역에 포커스
   useEffect(() => {
     if (isChatStarted && !isDisabled) {
       setTimeout(() => {
@@ -28,10 +30,12 @@ const ChatInterface = ({
     }
   }, [isChatStarted, isDisabled]);
 
+  // 새 메시지가 추가될 때마다 스크롤을 맨 아래로 이동
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // 메시지 제출 핸들러
   const handleSubmit = (e) => {
     e.preventDefault();
     if (inputValue.trim()) {
@@ -41,19 +45,25 @@ const ChatInterface = ({
 
   return (
     <div className="chat-interface">
+      {/* 메시지 목록 */}
       <div className="chat-messages">
         {messages.map((message) => (
           <Message key={message.id} text={message.text} user={message.user} typing={message.typing} attachedFiles={message.attachedFiles}/>
         ))}
         <div ref={messagesEndRef} />
       </div>
+      
+      {/* 입력 영역 */}
       <div className="input-area">
+        {/* 업로드된 파일 미리보기 */}
         <div className="uploaded-files">
           {uploadedFiles.map((file) => (
             <FilePreview key={file.id} file={file} onRemove={onRemoveFile} />
           ))}
         </div>
+        
         <div className="input-area-content">
+          {/* 파일 업로드 입력 (숨김) */}
           <input
             type="file"
             id="file-upload"
@@ -62,11 +72,14 @@ const ChatInterface = ({
             onChange={onFileUpload}
             disabled={isDisabled}
           />
+          
+          {/* 파일 첨부 버튼 */}
           <button
             className={`attach-button ${isDisabled ? 'disabled' : ''}`}
             onClick={() => document.getElementById('file-upload').click()}
             disabled={isDisabled}
           >
+            {/* SVG 아이콘 */}
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -76,6 +89,8 @@ const ChatInterface = ({
               ></path>
             </svg>
           </button>
+          
+          {/* 메시지 입력 폼 */}
           <form onSubmit={handleSubmit} style={{ flex: 1 }}>
             <textarea
               className="chat-textarea"
@@ -88,11 +103,14 @@ const ChatInterface = ({
               disabled={isDisabled}              
             />
           </form>
+          
+          {/* 전송 버튼 */}
           <button
             className={`send-button ${isDisabled ? 'disabled' : ''}`}
             onClick={handleSubmit}
             disabled={isDisabled}
           >
+            {/* SVG 아이콘 */}
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32" className="icon-2xl">
               <path
                 fill="currentColor"
