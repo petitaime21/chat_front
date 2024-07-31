@@ -1,9 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import useFileUpload from './useFileUpload'; 
 
-const useChatLogic = (start, threadId, isChatStarted) => {
+const useChatLogic = (start, threadId, isChatStarted, setIsLoading) => {  
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isDisabled, setIsDisabled] = useState(false);
@@ -137,11 +136,12 @@ const useChatLogic = (start, threadId, isChatStarted) => {
     }
   }, [isChatStarted, isDisabled]);
 
-  const { handleFileUpload, handleRemoveFile } = useFileUpload(
-    setMessages,
-    setUploadedFiles,
-    setIsDisabled
-  );
+  // const { handleFileUpload, handleRemoveFile } = useFileUpload(
+  //   setMessages,
+  //   setUploadedFiles,
+  //   setIsDisabled,
+  //   setIsLoading
+  // );
 
   return {
     messages,
@@ -155,8 +155,8 @@ const useChatLogic = (start, threadId, isChatStarted) => {
     setMessages: memoizedSetMessages,
     setUploadedFiles: memoizedSetUploadedFiles,
     setIsDisabled: memoizedSetIsDisabled,    
-    handleFileUpload,
-    handleRemoveFile,
+    // handleFileUpload,
+    // handleRemoveFile,
     isChatStarted
   };
 };

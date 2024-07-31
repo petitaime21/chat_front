@@ -2,12 +2,22 @@ import { useCallback } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
-const useFileUpload = (setMessages, setUploadedFiles, setIsDisabled) => {
+const useFileUpload = (setMessages, setUploadedFiles, setIsDisabled, setIsLoading) => {    
+
   const handleFileUpload = useCallback(async (e) => {
     const files = Array.from(e.target.files);
     const newUploadedFiles = [];
 
-    setIsDisabled(true);    
+    setIsDisabled(true);
+    
+    if (files.length >= 2) {
+        if (typeof setIsLoading === 'function') {
+          setIsLoading(true);
+        } else {
+          console.error('setIsLoading is not a function:', setIsLoading);
+        }
+      }
+    
 
     for (const file of files) {
       const extension = file.name.split('.').pop().toLowerCase();
@@ -48,8 +58,9 @@ const useFileUpload = (setMessages, setUploadedFiles, setIsDisabled) => {
 
     setUploadedFiles((prevFiles) => [...prevFiles, ...newUploadedFiles]);
     setIsDisabled(false);    
+    setIsLoading(false);  // 모든 파일 업로드 완료 후 로딩 종료
     e.target.value = '';
-  }, [setMessages, setUploadedFiles, setIsDisabled]);
+  }, [setMessages, setUploadedFiles, setIsDisabled, setIsLoading]);
 
   const handleRemoveFile = useCallback((fileId) => {
     setUploadedFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));

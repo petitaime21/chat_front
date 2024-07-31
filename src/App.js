@@ -5,7 +5,7 @@ import VideoPlayer from './components/VideoPlayer';
 import useChatLogic from './hooks/useChatLogic';
 import useFileUpload from './hooks/useFileUpload';
 
-const ChatApp = React.memo(({ start, threadId, isChatStarted }) => {
+const ChatApp = React.memo(({ start, threadId, isChatStarted, setIsLoading  }) => {  
   const {
     messages,
     inputValue,
@@ -18,12 +18,13 @@ const ChatApp = React.memo(({ start, threadId, isChatStarted }) => {
     setMessages,
     setUploadedFiles,
     setIsDisabled,    
-  } = useChatLogic(start, threadId, isChatStarted);
+  } = useChatLogic(start, threadId, isChatStarted, setIsLoading);
 
   const { handleFileUpload, handleRemoveFile } = useFileUpload(
     setMessages,
     setUploadedFiles,
-    setIsDisabled
+    setIsDisabled,
+    setIsLoading
   );
 
   return (
@@ -48,6 +49,7 @@ const App = () => {
   const [threadId, setThreadId] = useState(null);
   const [showInfoGraphic, setShowInfoGraphic] = useState(false);
   const [isChatStarted, setIsChatStarted] = useState(false);  
+  const [isLoading, setIsLoading] = useState(false);  // 새로운 state 추가
 
   useEffect(() => {
     sessionStorage.clear();
@@ -92,7 +94,11 @@ const App = () => {
 
   return (
     <div className="App">
- 
+      {isLoading && (  // 로딩 화면 조건부 렌더링
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )} 
       <div className="content-container">
         <div className="ipad-frame-container">
           {isOverlayVisible && (
@@ -101,7 +107,12 @@ const App = () => {
             </div>
           )}
           <div className="ipad-frame">
-            <ChatApp start={start} threadId={threadId} isChatStarted={isChatStarted} />
+            <ChatApp 
+              start={start} 
+              threadId={threadId} 
+              isChatStarted={isChatStarted} 
+              setIsLoading={setIsLoading}  // setIsLoading 함수 전달
+            />
           </div>
         </div>
         <VideoPlayer showInfoGraphic={showInfoGraphic} toggleInfoGraphic={toggleInfoGraphic} />
